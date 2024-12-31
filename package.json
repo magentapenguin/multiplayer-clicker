@@ -7,7 +7,9 @@
     "deploy": "partykit deploy"
   },
   "dependencies": {
-    "partysocket": "^1.0.2"
+    "nanoid": "^5.0.9",
+    "partysocket": "^1.0.2",
+    "rate-limiter-flexible": "^5.0.4"
   },
   "devDependencies": {
     "partykit": "^0.0.110",

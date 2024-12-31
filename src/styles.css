@@ -1,31 +1,254 @@
-/* 
-  We've already included normalize.css. 
-
-  But we'd like a modern looking boilerplate. 
-  Clean type, sans-serif, and a nice color palette. 
-  
-*/
-
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@keyframes bg-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
 body {
-  font-family: sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #333;
+  font-family: 'Space Mono', monospace;
+  /*background-color: #111;*/
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  --bg: #111;
+  --fg: #fff;
+  --subtle-fg: #888;
+  --border: #444;
+  --transparent-border: #4444;
+  --accent: #60f;
+  --success: #0c0;
+  --danger: #c00;
+  --warning: #ca0;
+  --info: #0cc;
+  background-color: var(--bg);
+  background-image: linear-gradient(to right, var(--transparent-border) 1px, transparent 1px), linear-gradient(0deg, var(--transparent-border) 1px, transparent 1px);
+  background-size: 5rem 5rem;
+  animation: bg-move 300s linear infinite;
+  color-scheme: dark;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: sans-serif;
-  font-weight: 600;
-  line-height: 1.25;
-  margin-top: 0;
-  margin-bottom: 0.5rem;
+#info {
+  font-weight: 700;
+  position: fixed;
+  font-size: 1.2em;
+  right: 0.5em;
+  bottom: 0.5em;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-direction: column;
+}
+#info > * {
+  font-weight: 700;
+  border: 1px solid var(--border);
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  background-color: transparent;
+  color: var(--fg);
+}
+#info > *:first-child {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#info > *:last-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: -1px;
+}
+#reset {
+  --alpha: 0;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  background-color: rgb(from var(--danger) r g b / var(--alpha));
+}
+#reset:hover {
+  --alpha: 0.2;
+}
+#reset:active {
+  --alpha: 0.5;
 }
 
-#app {
-  padding: 1rem;
+#click-count {
+  font-size: 3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 1ch;
+  height: 1.5em;
+  line-height: 3rem;
+  font-size: 2rem;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  border: var(--border) 2px solid;
+  outline: var(--transparent-border) 3px solid;
+  padding: 0 0.25em;
+  border-radius: 0.25em;
+  margin: 0.5em 0.2em;
+}
+@media (max-width: 600px) {
+  .ticker {
+    margin-left: 0.025em;
+    margin-right: 0.025em;
+    padding-left: 0.125em;
+    padding-right: 0.125em;
+  }
+  .comma {
+    display: none;
+  }
+}
+.ticker-track {
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s;
+}
+
+#click-button {
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: calc(100% - 10px);
+  position: relative;
+  overflow: hidden;
+  outline: #4444 2px solid;
+  margin: 0.5em 5px;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(20);
+    opacity: 0; 
+  }
+
+}
+
+#click-button .click-ripple {
+  position: absolute;
+  background: radial-gradient(#fff8, transparent);
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  top:  calc(var(--y) - 0.5em);
+  left: calc(var(--x) - 0.5em);
+  transform: scale(0);
+  opacity: 0.5;
+  animation: ripple 0.5s linear;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.comma {
+  color: var(--subtle-fg);
+}
+
+
+#click-button:hover {
+  background-color: var(--transparent-border);
+}
+
+/* toast.css */
+#toast-container {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 9999;
+  pointer-events: none;
+  left: 0;
+  bottom: 0;
+  padding: 20px;
+  width: 20rem;
+  box-sizing: border-box;
+  gap: 10px;
+}
+
+.toast {
+  position: relative;
+  margin: 0;
+  padding: 10px;
+
+  border-radius: 5px;
+  box-shadow: 0 0 10px var(--transparent-border);
+  background-color: var(--bg);
+  color: var(--fg);
+  font-size: 1rem;
+  pointer-events: auto;
+}
+.toast-title {
+  font-size: 1.2em;
+  margin-bottom: 5px;
+  display: block;
+  margin-right: 1.6rem;
+  clear: both;
+}
+.toast p {
+  margin: 0;
+  display: block;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+.toast-close {
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--fg);
+  background-color: transparent;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 0;
+}
+.toast-icon {
+  margin-right: 10px;
+  font-size: 1.5rem;
+  transform: translateY(-5px);
+  float: left;
+}
+.toast.success .toast-icon {
+  color: var(--success);
+}
+.toast.error .toast-icon {
+  color: var(--danger);
+}
+.toast.warning .toast-icon {
+  color: var(--warning);
+}
+.toast.info .toast-icon {
+  color: var(--info);
+}
+.toast.default .toast-icon {
+  color: var(--fg);
+}
+@media (forced-colors: active) {
+  .toast {
+      border: 2px solid ButtonBorder;
+  }
+  .toast-close {
+      border: none;
+  }
+  .toast-icon {
+      color: Highlight;
+  }
 }
