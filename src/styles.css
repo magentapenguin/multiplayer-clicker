@@ -136,6 +136,10 @@ body {
   outline: #4444 2px solid;
   margin: 0.5em 5px;
 }
+#click-button:disabled {
+  cursor: not-allowed;
+  background-color: var(--transparent-border);
+}
 
 @keyframes ripple {
   to {
@@ -170,6 +174,15 @@ body {
 }
 
 /* toast.css */
+svg.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+}
+svg.icon path {
+  fill: currentColor;
+}
 #toast-container {
   position: fixed;
   display: flex;
@@ -203,6 +216,7 @@ body {
   display: block;
   margin-right: 1.6rem;
   clear: both;
+  font-weight: 700;
 }
 .toast p {
   margin: 0;
@@ -219,6 +233,7 @@ body {
   top: 5px;
   right: 5px;
   padding: 0;
+  border: none;
 }
 .toast-icon {
   margin-right: 10px;
@@ -226,10 +241,13 @@ body {
   transform: translateY(-5px);
   float: left;
 }
+.toast .toast-icon {
+  color: var(--fg);
+}
 .toast.success .toast-icon {
   color: var(--success);
 }
-.toast.error .toast-icon {
+.toast.danger .toast-icon {
   color: var(--danger);
 }
 .toast.warning .toast-icon {
@@ -237,9 +255,6 @@ body {
 }
 .toast.info .toast-icon {
   color: var(--info);
-}
-.toast.default .toast-icon {
-  color: var(--fg);
 }
 @media (forced-colors: active) {
   .toast {

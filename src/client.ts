@@ -97,10 +97,18 @@ party.addEventListener("message", (event) => {
     clickRipple.style.setProperty("--y", `${data.y}px`);
     t.appendChild(clickRipple);
     setTimeout(() => clickRipple.remove(), 600);
+  } else if (data.type === "error" && data.errortype === "ratelimit") {
+    toast("Error", data.message, { duration: parseInt(data.retryIn) * 1000, type: "danger" });
+    if (clickButton) {
+      clickButton.disabled = true;
+      setTimeout(() => {
+        clickButton.disabled = false;
+      }, parseInt(data.retryIn) * 1000);
+    }
   }
 });
 
-const clickButton = document.getElementById("click-button");
+const clickButton = document.getElementById("click-button") as HTMLButtonElement | null;
 if (clickButton) {
   clickButton.addEventListener("click", click);
 }
