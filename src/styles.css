@@ -1,12 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 @keyframes bg-move {
   0% {
     background-position: 0 0;
   }
+
   100% {
     background-position: 100% 100%;
   }
 }
+
 body {
   font-family: 'Space Mono', monospace;
   /*background-color: #111;*/
@@ -31,6 +34,7 @@ body {
   background-size: 5rem 5rem;
   animation: bg-move 300s linear infinite;
   color-scheme: dark;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
 }
 
 #info {
@@ -44,7 +48,8 @@ body {
   justify-content: center;
   flex-direction: column;
 }
-#info > * {
+
+#info>* {
   font-weight: 700;
   border: 1px solid var(--border);
   padding: 0.5em 1em;
@@ -54,34 +59,63 @@ body {
   background-color: transparent;
   color: var(--fg);
 }
-#info > *:first-child {
+
+#info>*:first-child {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
-#info > *:last-child {
+
+#info>*:last-child {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: -1px;
 }
-#reset {
+
+@property --alpha {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+#reset-button,
+#reset-yes {
   --alpha: 0;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, --alpha 0.3s, border-color 0.3s;
   cursor: pointer;
   background-color: rgb(from var(--danger) r g b / var(--alpha));
+  border-color: color-mix(in lab, var(--danger) calc(100% * var(--alpha)), var(--border) 100%);
 }
-#reset:hover {
+
+#reset-yes {
   --alpha: 0.2;
 }
-#reset:active {
+
+#reset-yes:hover {
+  --alpha: 0.5;
+}
+
+#reset-yes:active {
+  --alpha: 0.8;
+}
+
+#reset-button:hover {
+  --alpha: 0.2;
+}
+
+#reset-button:active {
   --alpha: 0.5;
 }
 
 #click-count {
-  font-size: 3rem;
+  font-size: 2em;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .ticker {
@@ -89,8 +123,7 @@ body {
   white-space: nowrap;
   width: 1ch;
   height: 1.5em;
-  line-height: 3rem;
-  font-size: 2rem;
+  line-height: 1.5em;
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   border: var(--border) 2px solid;
@@ -99,17 +132,20 @@ body {
   border-radius: 0.25em;
   margin: 0.5em 0.2em;
 }
-@media (max-width: 600px) {
+
+@media (max-width: 610px) {
   .ticker {
     margin-left: 0.025em;
     margin-right: 0.025em;
     padding-left: 0.125em;
     padding-right: 0.125em;
   }
+
   .comma {
     display: none;
   }
 }
+
 .ticker-track {
   top: 0;
   left: 0;
@@ -119,7 +155,7 @@ body {
 }
 
 #click-button {
-  font-size: 1.5rem;
+  font-size: 1.5em;
   font-weight: 700;
   padding: 0.5em 1em;
   border-radius: 0.5em;
@@ -135,7 +171,17 @@ body {
   overflow: hidden;
   outline: #4444 2px solid;
   margin: 0.5em 5px;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
+
+:focus-visible {
+  outline: var(--accent) 2px solid !important;
+}
+
 #click-button:disabled {
   cursor: not-allowed;
   background-color: var(--transparent-border);
@@ -144,7 +190,7 @@ body {
 @keyframes ripple {
   to {
     transform: scale(20);
-    opacity: 0; 
+    opacity: 0;
   }
 
 }
@@ -155,7 +201,7 @@ body {
   border-radius: 50%;
   width: 1em;
   height: 1em;
-  top:  calc(var(--y) - 0.5em);
+  top: calc(var(--y) - 0.5em);
   left: calc(var(--x) - 0.5em);
   transform: scale(0);
   opacity: 0.5;
@@ -166,11 +212,91 @@ body {
 
 .comma {
   color: var(--subtle-fg);
+  font-size: 1.2em;
 }
-
 
 #click-button:hover {
   background-color: var(--transparent-border);
+}
+
+#reset-dialog {
+  border-radius: 0.5em;
+  padding: 1em;
+  background-color: var(--bg);
+  border-color: var(--transparent-border);
+  width: fit-content;
+}
+
+#reset-dialog p {
+  font-size: 1.2em;
+}
+#reset-dialog h2 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+::backdrop {
+  background-color: rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+button:hover {
+  background-color: var(--transparent-border);
+}
+
+#mp-cursors {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+.cursor {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  pointer-events: none;
+}
+
+#status {
+  position: fixed;
+  top: 0.5em;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  z-index: 9999;
+}
+#status div {
+  font-weight: 700;
+  display: none;
+}
+.loading #connecting {
+  display: block;
+  color: var(--warning);
+}
+.connected #connected {
+  display: block;
+  color: var(--success);
+}
+.disconnected #disconnected {
+  display: block;
+  color: var(--danger);
 }
 
 /* toast.css */
@@ -180,9 +306,11 @@ svg.icon {
   vertical-align: -0.15em;
   fill: currentColor;
 }
+
 svg.icon path {
   fill: currentColor;
 }
+
 #toast-container {
   position: fixed;
   display: flex;
@@ -210,6 +338,7 @@ svg.icon path {
   font-size: 1rem;
   pointer-events: auto;
 }
+
 .toast-title {
   font-size: 1.2em;
   margin-bottom: 5px;
@@ -218,12 +347,14 @@ svg.icon path {
   clear: both;
   font-weight: 700;
 }
+
 .toast p {
   margin: 0;
   display: block;
   font-size: 0.8em;
   font-weight: normal;
 }
+
 .toast-close {
   cursor: pointer;
   font-size: 1.6rem;
@@ -235,35 +366,44 @@ svg.icon path {
   padding: 0;
   border: none;
 }
+
 .toast-icon {
   margin-right: 10px;
   font-size: 1.5rem;
   transform: translateY(-5px);
   float: left;
 }
+
 .toast .toast-icon {
   color: var(--fg);
 }
+
 .toast.success .toast-icon {
   color: var(--success);
 }
+
 .toast.danger .toast-icon {
   color: var(--danger);
 }
+
 .toast.warning .toast-icon {
   color: var(--warning);
 }
+
 .toast.info .toast-icon {
   color: var(--info);
 }
+
 @media (forced-colors: active) {
   .toast {
-      border: 2px solid ButtonBorder;
+    border: 2px solid ButtonBorder;
   }
+
   .toast-close {
-      border: none;
+    border: none;
   }
+
   .toast-icon {
-      color: Highlight;
+    color: Highlight;
   }
 }
