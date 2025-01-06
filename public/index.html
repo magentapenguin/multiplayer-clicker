@@ -12,14 +12,14 @@
 </head>
 
 <body>
-  <div id="status">
+  <div id="status" aria-live="polite">
     <div id="connecting">Connecting...</div>
     <div id="connected">Connected</div>
     <div id="disconnected">Disconnected</div>
   </div>
-  <div id="mp-cursors"></div>
+  <div id="mp-cursors" aria-hidden="true"></div>
   <div id="app">
-    <div id="click-count"></div>
+    <div id="click-count" aria-live="polite"></div>
     <button id="click-button" type="button">+1</button>
   </div>
   <dialog id="reset-dialog">
@@ -30,7 +30,7 @@
       <button id="reset-no" type="submit" value="cancel" autofocus>No</button>
     </form>
   </dialog>
-  <div id="info"><span id="users">0 online</span><button type="button" id="reset-button">Reset</button></div>
+  <div id="info"><span id="users" aria-live="polite">0 online</span><button type="button" id="reset-button">Reset</button></div>
   <script type="module" src="/dist/client.js"></script>
 </body>
 </html>

@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "partykit": "^0.0.110",
-    "typescript": "^5.5.4",
-    "bottleneck": "^2.19.5"
+    "typescript": "^5.5.4"
   }
 }
