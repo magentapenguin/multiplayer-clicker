@@ -306,6 +306,30 @@ button:hover {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+#shop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: 5em;
+  padding: 1em;
+  z-index: 9999;
+  background: #222;
+  border-radius: 1em;
+}
+#shop-close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  cursor: pointer;
+  font-size: 1em;
+  color: var(--fg);
+}
+
 /* toast.css */
 svg.icon {
   width: 1em;
@@ -323,7 +347,7 @@ svg.icon path {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  z-index: 9999;
+  z-index: 99999;
   pointer-events: none;
   left: 0;
   bottom: 0;

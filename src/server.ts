@@ -40,7 +40,7 @@ export default class Server implements Party.Server {
 
   constructor(readonly room: Party.Room) {
     this.users = 0;
-    this.clicks = 0;
+    this.clicks = -1;
     this.points = 0;
     this.unlockedItems = {
       "1-point": true,
@@ -123,7 +123,7 @@ export default class Server implements Party.Server {
     }
     const data = result.data;
     if (data.type === "click") {
-      if (this.rateLimit(sender)) return;
+      if (!this.rateLimit(sender)) return;
       this.clicks++;
       this.room.broadcast(
         JSON.stringify({ type: "clicks", clicks: this.clicks })
@@ -142,10 +142,9 @@ export default class Server implements Party.Server {
         this.clicks -= item.price;
       }
 
-    } else {
-      message = JSON.stringify({ ...data, sender: sender.id });
-      this.room.broadcast(message, [sender.id]);
     }
+    message = JSON.stringify({ ...data, sender: sender.id });
+    this.room.broadcast(message, [sender.id]);
   }
 
   async onStart() {

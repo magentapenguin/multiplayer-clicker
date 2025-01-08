@@ -67,13 +67,8 @@ if (clickCount) {
 }
 
 function click(event: MouseEvent) {
-  clicks++;
-  setTickersValue(tickers, clicks);
-  if (clickCount) {
-    clickCount.ariaLabel = clicks.toString();
-  }
   let t = event.target as HTMLButtonElement;
-  party.send(JSON.stringify({ type: "click", x: event.clientX - t.offsetLeft, y: event.clientY - t.offsetTop }));
+  party.send(JSON.stringify({ type: "click" }));
   let clickRipple = document.createElement("div");
   clickRipple.className = "click-ripple";
   clickRipple.style.setProperty("--x", `${event.clientX - t.offsetLeft}px`);
@@ -88,6 +83,9 @@ party.addEventListener("message", (event) => {
   if (data.type === "clicks") {
     clicks = data.clicks;
     setTickersValue(tickers, clicks);
+    if (clickCount) {
+      clickCount.ariaLabel = clicks.toString();
+    }
   } else if (data.type === "users") {
     const users = document.getElementById("users");
     if (users) {
@@ -128,4 +126,9 @@ model.addEventListener("close", () => {
   if (model.returnValue === "reset") {
     party.send(JSON.stringify({ type: "reset-request" }));
   }
+});
+const shopButton = document.getElementById("shop-button") as HTMLButtonElement;
+shopButton.addEventListener("click", () => {
+  const shop = document.getElementById("shop") as HTMLElement;
+  shop.classList.toggle("hidden");
 });
