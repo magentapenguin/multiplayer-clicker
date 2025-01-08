@@ -1,5 +1,7 @@
 import type * as Party from "partykit/server";
 import z from "zod";
+import obscenity from "obscenity";
+
 
 const ShopMessage = z.object({
   type: z.literal("shop"),
@@ -31,6 +33,11 @@ interface ShopItem {
 
 const rateLimit = 100;
 
+const profanityFilter = new obscenity.RegExpMatcher({
+  ...obscenity.englishDataset.build(),
+  ...obscenity.englishRecommendedTransformers,
+});
+const profanityCensor = new obscenity.TextCensor();
 export default class Server implements Party.Server {
   users: number;
   clicks: number;
@@ -141,7 +148,11 @@ export default class Server implements Party.Server {
         }
         this.clicks -= item.price;
       }
-
+    } else if (data.type === "chat") {
+      if (!this.rateLimit(sender)) return;
+      const message = profanityCensor.applyTo(data.message, profanityFilter.getAllMatches(data.message));
+      this.room.broadcast(JSON.stringify({ type: "chat", message, sender: sender.id}), [sender.id]);
+      return;
     }
     message = JSON.stringify({ ...data, sender: sender.id });
     this.room.broadcast(message, [sender.id]);

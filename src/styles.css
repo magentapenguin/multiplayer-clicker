@@ -24,7 +24,7 @@ body {
   --subtle-fg: #888;
   --border: #444;
   --transparent-border: #4444;
-  --accent: #60f;
+  --accent: #cc00ff;
   --success: #0c0;
   --danger: #c00;
   --warning: #ca0;
@@ -259,6 +259,15 @@ button {
 button:hover {
   background-color: var(--transparent-border);
 }
+input {
+  background-color: transparent;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5em;
+  border-radius: 0.5em;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
 
 #mp-cursors {
   position: fixed;
@@ -321,15 +330,38 @@ button:hover {
   background: #222;
   border-radius: 1em;
 }
+#shop h2 {
+  font-size: 1.5em;
+  margin-top: 0;
+}
 #shop-close {
   position: absolute;
-  top: 0.5em;
+  bottom: 0.5em;
   right: 0.5em;
+  left: 0.5em;
   cursor: pointer;
   font-size: 1em;
   color: var(--fg);
 }
-
+#shop-bg {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -5;
+}
+#chat {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: fit-content;
+  z-index: 99995;
+  background: var(--bg);
+  border-radius: 1em 1em 0 0;
+  padding: 1em;
+}
 /* toast.css */
 svg.icon {
   width: 1em;
