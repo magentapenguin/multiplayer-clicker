@@ -131,10 +131,25 @@ shopButton.addEventListener("click", () => {
   shop.classList.toggle("hidden");
 });
 
+
+const chat = document.getElementById("chat") as HTMLFormElement;
+const chatInput = chat.querySelector("input") as HTMLInputElement;
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Slash") {
+  if (event.key === "/") {
     event.preventDefault();
-    const chat = document.getElementById("chat") as HTMLElement;
-    chat.focus();
+    chat.hidden = false;
+    chatInput.focus();
   }
+});
+chat.addEventListener("submit", (event) => {
+  event.preventDefault();
+  party.send(JSON.stringify({ type: "chat", message: chatInput.value }));
+  chatInput.value = "";
+  chat.hidden = true;
+  chat.blur();
+});
+const chatClose = document.getElementById("chat-close") as HTMLButtonElement;
+chatClose.addEventListener("click", () => {
+  chat.hidden = true;
+  chat.blur();
 });
