@@ -1,6 +1,6 @@
 interface ToastOptions {
     duration?: number;
-    type?: 'info' | 'success' | 'warning' | 'danger';
+    type?: 'info' | 'success' | 'warning' | 'danger' | 'none';
     elem?: HTMLElement | null;
     icon?: string;
 }
@@ -18,7 +18,7 @@ export default function toast(title: string, message: string, options?: ToastOpt
     const toastEl = document.createElement('div');
     toastEl.className = 'toast';
     toastEl.setAttribute('aria-role', 'alert');
-    toastEl.classList.add(type);
+    if (type !== 'none') toastEl.classList.add(type);
 
     const iconel = document.createElement('div');
     iconel.className = 'toast-icon';
