@@ -30,7 +30,18 @@
       <button id="reset-no" type="submit" value="cancel" autofocus>No</button>
     </form>
   </dialog>
-  <div id="info"><span id="users" aria-live="polite">0 online</span><button type="button" id="reset-button">Reset</button></div>
+  <div id="shop" hidden>
+    <h2>Shop</h2>
+    <div id="shop-items">
+      Loading...
+    </div>
+    <button id="shop-close" type="button">Close</button>
+  </div>
+  <div id="info">
+    <span id="users" aria-live="polite">0 online</span>
+    <button type="button" id="reset-button">Reset</button>
+    <button type="button" id="shop-button">Shop</button>
+  </div>
   <script type="module" src="/dist/client.js"></script>
 </body>
 </html>

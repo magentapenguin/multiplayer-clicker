@@ -1,15 +1,64 @@
 import type * as Party from "partykit/server";
+import z from "zod";
+
+const ShopMessage = z.object({
+  type: z.literal("shop"),
+  item: z.string(),
+  action: z.literal("buy"),
+});
+const ClickMessage = z.object({
+  type: z.literal("click"),
+});
+const ChatMessage = z.object({
+  type: z.literal("chat"),
+  message: z.string(),
+});
+const CursorMessage = z.object({
+  type: z.literal("cursor"),
+  x: z.number(),
+  y: z.number(),
+});
+const Message = z.union([ShopMessage, ClickMessage, ChatMessage, CursorMessage]);
+
+interface ShopItem {
+  name: string;
+  price: number;
+  priceType: "clicks" | "points";
+  description: string;
+  action: "addPoints" | "addClicks" | "unlockItem" | "buyItem";
+  value: number | string;
+}
 
 const rateLimit = 100;
 
 export default class Server implements Party.Server {
   users: number;
   clicks: number;
+  points: number;
+  unlockedItems: Record<string, boolean>;
+  purchasedItems: Record<string, number>;
 
   constructor(readonly room: Party.Room) {
     this.users = 0;
-    this.clicks = -1;
+    this.clicks = 0;
+    this.points = 0;
+    this.unlockedItems = {
+      "1-point": true,
+    };
+    this.purchasedItems = {};
   }
+
+  shopItems = {
+    "1-point": {
+      "name": "1 Point",
+      "price": 5,
+      "priceType": "clicks",
+      "description": "Convert 5 clicks into 1 point",
+      "action": "addPoints",
+      "value": 1
+    },
+    // TODO: Add more shop items
+  } as Record<string, ShopItem>; 
 
   onConnect(
     connection: Party.Connection<{ lastMsg: number }>,
@@ -19,8 +68,10 @@ export default class Server implements Party.Server {
     this.room.broadcast(JSON.stringify({ type: "users", users: this.users }));
     connection.send(JSON.stringify({ type: "clicks", clicks: this.clicks }));
     connection.setState({ lastMsg: performance.now() });
+    connection.send(
+      JSON.stringify({ type: "shopData", items: this.shopItems, unlockedItems: this.unlockedItems, purchasedItems: this.purchasedItems })
+    );
   }
-
   onClose(connection: Party.Connection) {
     this.users--;
     this.room.broadcast(JSON.stringify({ type: "users", users: this.users }));
@@ -33,38 +84,68 @@ export default class Server implements Party.Server {
     this.room.broadcast(JSON.stringify({ type: "leave", id: connection.id }));
     console.error(error);
   }
+  rateLimit(connection: Party.Connection<{ lastMsg: number }>) {
+    const now = performance.now();
+    if (connection.state?.lastMsg && connection.state?.lastMsg > now - rateLimit) {
+      console.log("Rate limited");
+      connection.send(
+        JSON.stringify({
+          type: "error",
+          errortype: "ratelimit",
+          message: "Rate limited",
+          retryIn: Math.ceil(
+            (connection.state.lastMsg + rateLimit - now) / 1000
+          ).toString(),
+        })
+      );
+      connection.setState({ lastMsg: now });
+      return false;
+    }
+    connection.setState({ lastMsg: now });
+    return true;
+  }
 
   async onMessage(
     message: string,
     sender: Party.Connection<{ lastMsg: number }>
   ) {
-    const data = JSON.parse(message);
-    const now = performance.now();
+    const result = Message.safeParse(JSON.parse(message));
+    if (!result.success) {
+      console.error(result.error);
+      sender.send(
+        JSON.stringify({
+          type: "error",
+          errortype: "invalidMessage",
+          message: result.error.errors,
+        })
+      );
+      return;
+    }
+    const data = result.data;
     if (data.type === "click") {
-      if (sender.state?.lastMsg && sender.state?.lastMsg > now - rateLimit) {
-        console.log("Rate limited");
-        sender.send(
-          JSON.stringify({
-            type: "error",
-            errortype: "ratelimit",
-            message: "Rate limited",
-            retryIn: Math.ceil(
-              (sender.state.lastMsg + rateLimit - now) / 1000
-            ).toString(),
-          })
-        );
-        sender.setState({ lastMsg: now });
-        return;
-      }
+      if (this.rateLimit(sender)) return;
       this.clicks++;
       this.room.broadcast(
         JSON.stringify({ type: "clicks", clicks: this.clicks })
       );
       await this.syncStorage(true);
-      sender.setState({ lastMsg: now });
+    } else if (data.type === "shop") {
+      if (this.rateLimit(sender)) return;
+      const item = this.shopItems[data.item];
+      if (!item) {
+        return;
+      }
+      if (item.priceType === "clicks") {
+        if (this.clicks < item.price) {
+          return;
+        }
+        this.clicks -= item.price;
+      }
+
+    } else {
+      message = JSON.stringify({ ...data, sender: sender.id });
+      this.room.broadcast(message, [sender.id]);
     }
-    message = JSON.stringify({ ...data, sender: sender.id });
-    this.room.broadcast(message, [sender.id]);
   }
 
   async onStart() {
