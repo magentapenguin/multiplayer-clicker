@@ -376,17 +376,17 @@ input {
 }
 #chat {
   position: fixed;
-  bottom: 0;
-  left: 0;
+  top: 0;
+  right: 0;
   padding: 0.75em;
   padding-top: 0;
   width: fit-content;
   z-index: 99995;
   background: var(--bg);
-  border-radius: 0 1em 0 0;
+  border-radius: 0 0 0 1em;
   border: 1px solid var(--border);
-  border-left: none;
-  border-bottom: none;
+  border-right: none;
+  border-top: none;
 }
 /* toast.css */
 svg.icon {
