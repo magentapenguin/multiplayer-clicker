@@ -1,9 +1,4 @@
-interface ToastOptions {
-    duration?: number;
-    type?: 'info' | 'success' | 'warning' | 'danger' | 'none';
-    elem?: HTMLElement | null;
-    icon?: string;
-}
+import type { ToastOptions } from "./types";
 
 export default function toast(title: string, message: string, options?: ToastOptions): HTMLElement {
     const { 

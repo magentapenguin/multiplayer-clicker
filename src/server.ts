@@ -1,35 +1,8 @@
 import type * as Party from "partykit/server";
-import z from "zod";
 import obscenity from "obscenity";
+import { Message } from "./types";
+import type { ShopItem } from "./types";
 
-
-const ShopMessage = z.object({
-  type: z.literal("shop"),
-  item: z.string(),
-  action: z.literal("buy"),
-});
-const ClickMessage = z.object({
-  type: z.literal("click"),
-});
-const ChatMessage = z.object({
-  type: z.literal("chat"),
-  message: z.string(),
-});
-const CursorMessage = z.object({
-  type: z.literal("cursor"),
-  x: z.number(),
-  y: z.number(),
-});
-const Message = z.union([ShopMessage, ClickMessage, ChatMessage, CursorMessage]);
-
-interface ShopItem {
-  name: string;
-  price: number;
-  priceType: "clicks" | "points";
-  description: string;
-  action: "addPoints" | "addClicks" | "unlockItem" | "buyItem";
-  value: number | string;
-}
 
 const rateLimit = 100;
 

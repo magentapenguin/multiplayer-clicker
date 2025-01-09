@@ -434,13 +434,13 @@ svg.icon path {
   display: block;
   margin-right: 1.6rem;
   clear: both;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .toast p {
   margin: 0;
   display: block;
-  font-size: 0.8em;
+  font-size: 1em;
   font-weight: normal;
 }
 
