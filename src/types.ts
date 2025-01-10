@@ -3,7 +3,7 @@ import z from "zod";
 const ShopMessage = z.object({
   type: z.literal("shop"),
   item: z.string(),
-  action: z.literal("buy"),
+  action: z.string(),
 });
 const ClickMessage = z.object({
   type: z.literal("click"),
@@ -17,14 +17,18 @@ const CursorMessage = z.object({
   x: z.number(),
   y: z.number(),
 });
-export const Message = z.union([ShopMessage, ClickMessage, ChatMessage, CursorMessage]);
+const ReadyMessage = z.object({
+  type: z.literal("ready"),
+});
+export const Message = z.union([ShopMessage, ClickMessage, ChatMessage, CursorMessage, ReadyMessage]);
 export interface ShopItem {
   name: string;
   price: number;
+  priceScale: number;
   priceType: "clicks" | "points";
   description: string;
-  action: "addPoints" | "addClicks" | "unlockItem" | "buyItem";
-  value: number | string;
+  action: "addPoints" | "addClicks" | "unlockItem" | "buyItem" | "none";
+  value?: number | string;
 }
 export interface ToastOptions {
     duration?: number;

@@ -32,11 +32,37 @@ export default class Server implements Party.Server {
     "1-point": {
       "name": "1 Point",
       "price": 5,
+      "priceScale": 1.1,
       "priceType": "clicks",
       "description": "Convert 5 clicks into 1 point",
       "action": "addPoints",
       "value": 1
     },
+    "ac": {
+      "name": "Autoclicker",
+      "price": 100,
+      "priceScale": 1.1,
+      "priceType": "points",
+      "description": "Test",
+      "action": "unlockItem",
+      "value": "auto-clicker"
+    },
+    "test": {
+      "name": "Test",
+      "price": 100,
+      "priceScale": 1.1,
+      "priceType": "points",
+      "description": "Test",
+      "action": "none"
+    },
+    "test2": {
+      "name": "Test2",
+      "price": 100,
+      "priceScale": 1.1,
+      "priceType": "points",
+      "description": "Test",
+      "action": "none"
+    }
     // TODO: Add more shop items
   } as Record<string, ShopItem>; 
 
@@ -46,11 +72,7 @@ export default class Server implements Party.Server {
   ) {
     this.users++;
     this.room.broadcast(JSON.stringify({ type: "users", users: this.users }));
-    connection.send(JSON.stringify({ type: "clicks", clicks: this.clicks }));
     connection.setState({ lastMsg: performance.now() });
-    connection.send(
-      JSON.stringify({ type: "shopData", items: this.shopItems, unlockedItems: this.unlockedItems, purchasedItems: this.purchasedItems })
-    );
   }
   onClose(connection: Party.Connection) {
     this.users--;
@@ -117,18 +139,39 @@ export default class Server implements Party.Server {
       }
       if (item.priceType === "clicks") {
         if (this.clicks < item.price) {
+          sender.send(
+            JSON.stringify({
+              type: "error",
+              errortype: "insufficientFunds",
+              message: "Insufficient funds",
+            })
+          );
           return;
         }
         this.clicks -= item.price;
+      } else if (item.priceType === "points") {
+        if (this.points < item.price) {
+          sender.send(
+            JSON.stringify({
+              type: "error",
+              errortype: "insufficientFunds",
+              message: "Insufficient funds",
+            })
+          );
+          return;
+        }
+        this.points -= item.price;
       }
     } else if (data.type === "chat") {
       if (!this.rateLimit(sender)) return;
       const message = profanityCensor.applyTo(data.message, profanityFilter.getAllMatches(data.message));
       this.room.broadcast(JSON.stringify({ type: "chat", message, sender: sender.id}), [sender.id]);
-      return;
+    } else if (data.type === "ready") {
+      sender.send(JSON.stringify({ type: "clicks", clicks: this.clicks }));
+      sender.send(
+        JSON.stringify({ type: "shopData", items: this.shopItems, unlockedItems: this.unlockedItems, purchasedItems: this.purchasedItems })
+      );
     }
-    message = JSON.stringify({ ...data, sender: sender.id });
-    this.room.broadcast(message, [sender.id]);
   }
 
   async onStart() {

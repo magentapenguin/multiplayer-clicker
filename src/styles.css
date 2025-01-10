@@ -336,9 +336,8 @@ input {
   border-radius: 0;
   border-right-style: none;
 }
-
-.hidden {
-  display: none;
+[hidden] {
+  display: none !important;
 }
 #shop {
   position: fixed;
@@ -351,19 +350,12 @@ input {
   z-index: 9999;
   background: #222;
   border-radius: 1em;
+  display: flex;
+  flex-direction: column;
 }
 #shop h2 {
   font-size: 1.5em;
   margin-top: 0;
-}
-#shop-close {
-  position: absolute;
-  bottom: 0.5em;
-  right: 0.5em;
-  left: 0.5em;
-  cursor: pointer;
-  font-size: 1em;
-  color: var(--fg);
 }
 #shop-bg {
   position: fixed;
@@ -372,7 +364,7 @@ input {
   left: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: -5;
+  z-index: 9998;
 }
 #chat {
   position: fixed;
@@ -387,6 +379,35 @@ input {
   border: 1px solid var(--border);
   border-right: none;
   border-top: none;
+}
+#shop-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
+  gap: 1em;
+  overflow-y: auto;
+  padding-bottom: 0.8em;
+  margin-bottom: 0.2em;
+  flex: auto;
+}
+.shop-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 0.5em;
+  border: 1px solid var(--border);
+  border-radius: 0.5em;
+  background: linear-gradient(-45deg, var(--transparent-border) 25%, transparent 25%, transparent 50%, var(--transparent-border) 50%, var(--transparent-border) 75%, transparent 75%, transparent);
+  background-size: 1em 1em;
+  background-repeat: repeat;
+  box-shadow: 0 0 10px var(--transparent-border);
+  animation: bg-move 100s linear infinite;
+}
+.shop-item .shop-item-title {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+.shop-item button {
+  width: 100%;
 }
 /* toast.css */
 svg.icon {
