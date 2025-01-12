@@ -28,43 +28,43 @@ export default class Server implements Party.Server {
     this.purchasedItems = {};
   }
 
-  shopItems = {
-    "1-point": {
-      "name": "1 Point",
-      "price": 5,
-      "priceScale": 1.1,
-      "priceType": "clicks",
-      "description": "Convert 5 clicks into 1 point",
-      "action": "addPoints",
-      "value": 1
+  shopItems = [
+    {
+      name: "1 Point",
+      price: 5,
+      priceScale: 1.1,
+      priceType: "clicks",
+      description: "Convert 5 clicks into 1 point",
+      action: "addPoints",
+      id: "1-point",
+      value: 1
     },
-    "ac": {
-      "name": "Autoclicker",
-      "price": 100,
-      "priceScale": 1.1,
-      "priceType": "points",
-      "description": "Test",
-      "action": "unlockItem",
-      "value": "auto-clicker"
+    {
+      name: "Autoclicker Unlock",
+      price: 100,
+      priceScale: 0,
+      priceType: "points",
+      description: "Unlock the autoclicker",
+      action: "unlockItem",
+      value: "auto-clicker",
+      id: "auto-clicker-unlock",
     },
-    "test": {
-      "name": "Test",
-      "price": 100,
-      "priceScale": 1.1,
-      "priceType": "points",
-      "description": "Test",
-      "action": "none"
-    },
-    "test2": {
-      "name": "Test2",
-      "price": 100,
-      "priceScale": 1.1,
-      "priceType": "points",
-      "description": "Test",
-      "action": "none"
+    {
+      name: "Autoclicker",
+      price: 20,
+      priceScale: 1.5,
+      priceType: "points",
+      description: "Automatically click once per second",
+      action: "buyItem",
+      value: "auto-clicker",
+      id: "auto-clicker",
     }
     // TODO: Add more shop items
-  } as Record<string, ShopItem>; 
+   ] as ShopItem[];
+  
+  getScaledPrice(item: ShopItem) {
+    return item.price * Math.pow(item.priceScale, this.purchasedItems[item.id] ?? 0);
+  }
 
   onConnect(
     connection: Party.Connection<{ lastMsg: number }>,
@@ -133,12 +133,13 @@ export default class Server implements Party.Server {
       await this.syncStorage(true);
     } else if (data.type === "shop") {
       if (this.rateLimit(sender)) return;
-      const item = this.shopItems[data.item];
+      const item = this.shopItems.find((item) => item.id === data.item);
       if (!item) {
         return;
       }
+      const price = this.getScaledPrice(item);
       if (item.priceType === "clicks") {
-        if (this.clicks < item.price) {
+        if (this.clicks < price) {
           sender.send(
             JSON.stringify({
               type: "error",
@@ -148,9 +149,9 @@ export default class Server implements Party.Server {
           );
           return;
         }
-        this.clicks -= item.price;
+        this.clicks -= price;
       } else if (item.priceType === "points") {
-        if (this.points < item.price) {
+        if (this.points < price) {
           sender.send(
             JSON.stringify({
               type: "error",
@@ -160,7 +161,7 @@ export default class Server implements Party.Server {
           );
           return;
         }
-        this.points -= item.price;
+        this.points -= price;
       }
     } else if (data.type === "chat") {
       if (!this.rateLimit(sender)) return;
@@ -168,9 +169,12 @@ export default class Server implements Party.Server {
       this.room.broadcast(JSON.stringify({ type: "chat", message, sender: sender.id}), [sender.id]);
     } else if (data.type === "ready") {
       sender.send(JSON.stringify({ type: "clicks", clicks: this.clicks }));
+
       sender.send(
         JSON.stringify({ type: "shopData", items: this.shopItems, unlockedItems: this.unlockedItems, purchasedItems: this.purchasedItems })
       );
+    } else if (data.type === "cursor") {
+      this.room.broadcast(JSON.stringify({ ...data, sender: sender.id }), [sender.id]);
     }
   }
 
@@ -188,6 +192,24 @@ export default class Server implements Party.Server {
       await this.room.storage.put("clicks", this.clicks);
     } else {
       this.clicks = clicks as number;
+    }
+    const points = await this.room.storage.get("points");
+    if (overwrite || points === null || points === undefined) {
+      await this.room.storage.put("points", this.points);
+    } else {
+      this.points = points as number;
+    }
+    const unlockedItems = await this.room.storage.get("unlockedItems");
+    if (overwrite || unlockedItems === null || unlockedItems === undefined) {
+      await this.room.storage.put("unlockedItems", this.unlockedItems);
+    } else {
+      this.unlockedItems = unlockedItems as Record<string, boolean>;
+    }
+    const purchasedItems = await this.room.storage.get("purchasedItems");
+    if (overwrite || purchasedItems === null || purchasedItems === undefined) {
+      await this.room.storage.put("purchasedItems", this.purchasedItems);
+    } else {
+      this.purchasedItems = purchasedItems as Record<string, number>;
     }
   }
 }

@@ -3,7 +3,6 @@ import z from "zod";
 const ShopMessage = z.object({
   type: z.literal("shop"),
   item: z.string(),
-  action: z.string(),
 });
 const ClickMessage = z.object({
   type: z.literal("click"),
@@ -16,6 +15,7 @@ const CursorMessage = z.object({
   type: z.literal("cursor"),
   x: z.number(),
   y: z.number(),
+
 });
 const ReadyMessage = z.object({
   type: z.literal("ready"),
@@ -29,6 +29,7 @@ export interface ShopItem {
   description: string;
   action: "addPoints" | "addClicks" | "unlockItem" | "buyItem" | "none";
   value?: number | string;
+  id: string;
 }
 export interface ToastOptions {
     duration?: number;

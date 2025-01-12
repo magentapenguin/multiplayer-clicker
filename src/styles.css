@@ -352,6 +352,13 @@ input {
   border-radius: 1em;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--transparent-border);
+  box-shadow: 0 0 10px var(--transparent-border);
+}
+@media (max-width: 600px) {
+  #shop {
+    margin: 0.2em;
+  }
 }
 #shop h2 {
   font-size: 1.5em;
@@ -365,6 +372,9 @@ input {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 9998;
+}
+.spacer {
+  flex: auto;
 }
 #chat {
   position: fixed;
@@ -385,9 +395,10 @@ input {
   grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
   gap: 1em;
   overflow-y: auto;
-  padding-bottom: 0.8em;
-  margin-bottom: 0.2em;
   flex: auto;
+}
+#shop-close {
+  margin-top: 0.5em;
 }
 .shop-item {
   display: flex;
@@ -401,6 +412,9 @@ input {
   background-repeat: repeat;
   box-shadow: 0 0 10px var(--transparent-border);
   animation: bg-move 100s linear infinite;
+}
+.shop-item .spacer {
+  margin-top: -0.5em;
 }
 .shop-item .shop-item-title {
   font-size: 1.2em;
