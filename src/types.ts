@@ -25,9 +25,10 @@ export interface ShopItem {
   name: string;
   price: number;
   priceScale: number;
+  scaleType: "linear" | "expo";
   priceType: "clicks" | "points";
   description: string;
-  action: "addPoints" | "addClicks" | "unlockItem" | "buyItem" | "none";
+  action: "addPoints" | "addClicks" | "unlockItem" | "upStats" | "none";
   value?: number | string;
   id: string;
 }

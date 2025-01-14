@@ -298,6 +298,7 @@ input {
 :where(#status div) {
   font-weight: 700;
   display: none;
+  text-shadow: 0 0 10px currentColor;
 }
 .loading #connecting {
   display: block;

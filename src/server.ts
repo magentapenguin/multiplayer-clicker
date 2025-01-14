@@ -4,7 +4,7 @@ import { Message } from "./types";
 import type { ShopItem } from "./types";
 
 
-const rateLimit = 100;
+const rateLimit = 50;
 
 const profanityFilter = new obscenity.RegExpMatcher({
   ...obscenity.englishDataset.build(),
@@ -17,11 +17,21 @@ export default class Server implements Party.Server {
   points: number;
   unlockedItems: Record<string, boolean>;
   purchasedItems: Record<string, number>;
+  stats: {
+    rateLimit: number;
+    clickPerSecond: number;
+    clickPower: number
+  };
 
   constructor(readonly room: Party.Room) {
     this.users = 0;
     this.clicks = -1;
     this.points = 0;
+    this.stats = {
+      rateLimit: 0,
+      clickPerSecond: 0,
+      clickPower: 1,
+    };
     this.unlockedItems = {
       "1-point": true,
     };
@@ -40,25 +50,25 @@ export default class Server implements Party.Server {
       value: 1
     },
     {
-      name: "Autoclicker Unlock",
-      price: 100,
-      priceScale: 0,
-      priceType: "points",
-      description: "Unlock the autoclicker",
-      action: "unlockItem",
-      value: "auto-clicker",
-      id: "auto-clicker-unlock",
-    },
-    {
       name: "Autoclicker",
       price: 20,
-      priceScale: 1.5,
+      priceScale: 1.4,
       priceType: "points",
       description: "Automatically click once per second",
       action: "buyItem",
       value: "auto-clicker",
       id: "auto-clicker",
-    }
+    },
+    {
+      name: "Click Power",
+      price: 50,
+      priceScale: 1.2,
+      priceType: "points",
+      description: "Increase your click power by 1",
+      action: "upStats",
+      value: "clickPower",
+      id: "click-power",
+    },
     // TODO: Add more shop items
    ] as ShopItem[];
   
@@ -86,17 +96,26 @@ export default class Server implements Party.Server {
     this.room.broadcast(JSON.stringify({ type: "leave", id: connection.id }));
     console.error(error);
   }
+  applyStats() {
+    this.stats.clickPerSecond = 0;
+    this.stats.clickPower = 1;
+    if (this.purchasedItems["auto-clicker"]) {
+      this.stats.clickPerSecond += 1;
+    }
+    if (this.purchasedItems["click-power"]) {
+      this.stats.clickPower += this.purchasedItems["click-power"];
+    }
+  }
   rateLimit(connection: Party.Connection<{ lastMsg: number }>) {
     const now = performance.now();
-    if (connection.state?.lastMsg && connection.state?.lastMsg > now - rateLimit) {
-      console.log("Rate limited");
+    if (connection.state?.lastMsg && connection.state?.lastMsg > now - (rateLimit-this.stats.rateLimit)) { 
       connection.send(
         JSON.stringify({
           type: "error",
           errortype: "ratelimit",
           message: "Rate limited",
           retryIn: Math.ceil(
-            (connection.state.lastMsg + rateLimit - now) / 1000
+            (connection.state.lastMsg + (rateLimit-this.stats.rateLimit) - now) / 1000
           ).toString(),
         })
       );
