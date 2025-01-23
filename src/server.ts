@@ -202,7 +202,7 @@ export default class Server implements Party.Server {
       const message = profanityCensor.applyTo(data.message, profanityFilter.getAllMatches(data.message));
       // prevent xss
       const safemessage = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      this.room.broadcast(JSON.stringify({ type: "chat", safemessage, sender: sender.id}), [sender.id]);
+      this.room.broadcast(JSON.stringify({ type: "chat", message: safemessage, sender: sender.id}));
     } else if (data.type === "ready") {
       sender.send(JSON.stringify({ type: "clicks", clicks: this.clicks }));
 
