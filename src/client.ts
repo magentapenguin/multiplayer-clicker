@@ -113,6 +113,13 @@ party.addEventListener("message", (event) => {
   } else if (data.type === "shopData") {
     shop.receiveData(data.unlockedItems, data.purchasedItems);
     shop.setup(data.items);
+  } else if (data.type === "shopUpdate") {
+    shop.receiveData(data.unlockedItems, data.purchasedItems);
+  } else if (data.type === "stats") {
+    const stats = document.getElementById("stats");
+    if (stats) {
+      stats.textContent = data.stats;
+    }
   }
 });
 function updateConnection() {

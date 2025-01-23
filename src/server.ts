@@ -105,6 +105,7 @@ export default class Server implements Party.Server {
     if (this.purchasedItems["click-power"]) {
       this.stats.clickPower += this.purchasedItems["click-power"];
     }
+    this.room.broadcast(JSON.stringify({ type: "stats", stats: this.stats }));
   }
   rateLimit(connection: Party.Connection<{ lastMsg: number }>) {
     const now = performance.now();
@@ -156,6 +157,18 @@ export default class Server implements Party.Server {
       if (!item) {
         return;
       }
+      const action = (item: ShopItem) => {
+        if (item.action === "addPoints") {
+          if (typeof item.value !== "number") return;
+          this.points += item.value;
+        } else if (item.action === "unlockItem") {
+          if (typeof item.value !== "string") return;
+          this.unlockedItems[item.value] = true;
+        } else if (item.action === "upStats") {
+          this.purchasedItems[item.id] = (this.purchasedItems[item.id] ?? 0) + 1;
+          this.applyStats();
+        }
+      }
       const price = this.getScaledPrice(item);
       if (item.priceType === "clicks") {
         if (this.clicks < price) {
@@ -169,6 +182,7 @@ export default class Server implements Party.Server {
           return;
         }
         this.clicks -= price;
+        action(item);
       } else if (item.priceType === "points") {
         if (this.points < price) {
           sender.send(
@@ -181,6 +195,7 @@ export default class Server implements Party.Server {
           return;
         }
         this.points -= price;
+        action(item);
       }
     } else if (data.type === "chat") {
       if (!this.rateLimit(sender)) return;
