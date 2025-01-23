@@ -200,7 +200,9 @@ export default class Server implements Party.Server {
     } else if (data.type === "chat") {
       if (!this.rateLimit(sender)) return;
       const message = profanityCensor.applyTo(data.message, profanityFilter.getAllMatches(data.message));
-      this.room.broadcast(JSON.stringify({ type: "chat", message, sender: sender.id}), [sender.id]);
+      // prevent xss
+      const safemessage = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      this.room.broadcast(JSON.stringify({ type: "chat", safemessage, sender: sender.id}), [sender.id]);
     } else if (data.type === "ready") {
       sender.send(JSON.stringify({ type: "clicks", clicks: this.clicks }));
 
