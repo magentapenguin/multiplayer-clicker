@@ -346,7 +346,7 @@ input {
   right: 0;
   left: 0;
   bottom: 0;
-  margin: 5em;
+  margin: 3em;
   padding: 1em;
   z-index: 9999;
   background: #222;
@@ -358,12 +358,12 @@ input {
 }
 @media (max-width: 600px) {
   #shop {
-    margin: 0.2em;
+    margin: 0.5em;
   }
 }
 #shop h2 {
   font-size: 1.5em;
-  margin-top: 0;
+  margin: 0;
 }
 #shop-bg {
   position: fixed;
@@ -393,7 +393,7 @@ input {
 }
 #shop-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
   gap: 1em;
   overflow-y: auto;
   flex: auto;

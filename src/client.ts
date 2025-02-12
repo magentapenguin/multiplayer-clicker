@@ -77,6 +77,10 @@ if (clickCount) {
 
 function click(event: MouseEvent) {
   let t = event.target as HTMLButtonElement;
+  if (event.isTrusted === false) {
+    console.warn("Click event not trusted");
+    return;
+  }
   party.send(JSON.stringify({ type: "click" }));
   let clickRipple = document.createElement("div");
   clickRipple.className = "click-ripple";
